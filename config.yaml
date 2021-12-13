@@ -1,0 +1,7 @@
+jobsite:
+  - stepstone
+
+
+location:
+  city: Berlin
+  radius: 50 #km
