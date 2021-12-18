@@ -1,17 +1,21 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas
-from operator import itemgetter
+from baseparse import BaseParser
+
+
+
 
 class StepstoneParser(BaseParser):
     def __init__ (self, search:str, location:str, radius:int):
-        self.link = "https://www.stepstone.de/5/ergebnisliste.htm"
+        super().__init__("https://www.stepstone.de/5/ergebnisliste.htm")
         self.params = {
             "what": search,
             "where": location,
             "radius": radius
         }
-        super(StepstoneParser, self).generate_start_link(params)
+        encode_link(self, params)
+        
 
     def parse(self):
         response = requests.get(website, headers=headers)

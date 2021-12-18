@@ -40,4 +40,6 @@ while True:
     run+=1
     
 df=pd.DataFrame.from_records(jobs,columns=["id", "title", "company", "link"])
+df["link"]=df["link"].apply(lambda x: "stepstone.de"+x)
 df.to_csv("output/jobs.csv", index=False, sep=";", encoding="utf-8-sig")
+

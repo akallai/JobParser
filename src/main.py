@@ -1,6 +1,7 @@
 import yaml
 import os
 import pathlib
+from parsers.stepstone import StepstoneParser
 
 def main():
     #Load Config file
@@ -9,7 +10,9 @@ def main():
             config=yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
+    parser=StepstoneParser("Data Engineering", "Berlin", 30)
+    print(parser.link)
+
 
 if __name__ == '__main__':
     main()
-    parser = 
