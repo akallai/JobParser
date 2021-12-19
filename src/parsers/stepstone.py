@@ -18,7 +18,7 @@ class StepstoneParser(BaseParser):
         
 
     def parse(self):
-        super().encode_URL()
+        self.encode_URL()
         response = requests.get(self.encodedURL, headers=self.header)
         webpage = response.content
         soup = BeautifulSoup(webpage, "html.parser")

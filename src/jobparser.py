@@ -3,6 +3,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas
 from operator import itemgetter
+import csv
+from datetime import datetime
 
 import pandas as pd
 
@@ -24,22 +26,26 @@ def stepstoneparse(website):
         page_jobs.append([job_id ,job_title, company, link])
     return page_jobs
 
-stepstoneparse("https://www.stepstone.de/5/ergebnisliste.html?what=data%20engineer&where=Berlin&radius=0&searchOrigin=Homepage_top-search&of=0")
+#stepstoneparse("https://www.stepstone.de/5/ergebnisliste.html?what=data%20engineer&where=Deutschland&radius=0&searchOrigin=Homepage_top-search&of=0")
 
 run=0
 jobs=[]
-link="https://www.stepstone.de/5/ergebnisliste.html?what=data%20engineer&where=Potsdam&radius=0&searchOrigin=Homepage_top-search&of={}"
-while True:
-    parselink=link.format(run*25)
-    tmp=stepstoneparse(parselink)
-    if (not tmp):
-        break
-    print(len(tmp))
-    jobs+=tmp
-    print("parsed {} jobs".format((run+1)*25))
-    run+=1
+link="https://www.stepstone.de/5/ergebnisliste.html?what=data%20engineer&where=Deutschland&radius=0&searchOrigin=Homepage_top-search&of={}"
+with open ("output/jobs.csv", "a", encoding="utf-8", newline="") as jobfile, open ("output/log.csv", "a", encoding="utf-8") as logfile:
+    while True:
+        parselink=link.format(run*25)
+        logfile.write(str(datetime.now())+" - parsing link "+parselink+"\n")
+        tmp=stepstoneparse(parselink)
+        if (not tmp):
+            break
+        print(len(tmp))
+        #jobs+=tmp
+        writer = csv.writer(jobfile)
+        writer.writerows(tmp)
+        print("parsed {} jobs".format((run+1)*25))
+        run+=1
     
-df=pd.DataFrame.from_records(jobs,columns=["id", "title", "company", "link"])
-df["link"]=df["link"].apply(lambda x: "stepstone.de"+x)
-df.to_csv("output/jobs.csv", index=False, sep=";", encoding="utf-8-sig")
+#df=pd.DataFrame.from_records(jobs,columns=["id", "title", "company", "link"])
+#df["link"]=df["link"].apply(lambda x: "stepstone.de"+x)
+#df.to_csv("output/jobs.csv", index=False, sep=";", encoding="utf-8-sig")
 
