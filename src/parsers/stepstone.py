@@ -7,18 +7,19 @@ from baseparse import BaseParser
 
 
 class StepstoneParser(BaseParser):
-    def __init__ (self, search:str, location:str, radius:int):
-        super().__init__("https://www.stepstone.de/5/ergebnisliste.htm")
+    def __init__ (self, search:str, location:str, radius:int, debugmode=False):
+        super().__init__("https://www.stepstone.de/5/ergebnisliste.html")
         self.params = {
             "what": search,
             "where": location,
             "radius": radius
         }
-        encode_link(self, params)
+        
         
 
     def parse(self):
-        response = requests.get(website, headers=headers)
+        super().encode_URL()
+        response = requests.get(self.encodedURL, headers=self.header)
         webpage = response.content
         soup = BeautifulSoup(webpage, "html.parser")
         articles = soup.find_all('article')
