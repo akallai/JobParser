@@ -1,8 +1,9 @@
 import yaml
 import os
 import pathlib
-from parsers import StepstoneParser
 import logging
+
+from parsers import StepstoneParser
 
 def main():
     #Load Config file
@@ -11,10 +12,10 @@ def main():
     #         config=yaml.safe_load(stream)
     #     except yaml.YAMLError as exc:
     #         print(exc)
-    logging.basicConfig(filename="../output/logs.txt")
-    parser=StepstoneParser("Data Engineering", "Berlin", 30)
-    
-
+    logging.basicConfig(filename="logs.txt")
+    parser=StepstoneParser("Schauspieler", "Rheine", 30)
+    parser.parse()
+    #parser.to_csv("output.csv")
 
 if __name__ == '__main__':
     main()
