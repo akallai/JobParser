@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from urllib.parse import urlencode
 import logging
 import csv
+import pandas as pd
 
 from helper import retrieve_website
 from jobs import StepstoneJob
@@ -24,11 +25,12 @@ class BaseParser(ABC):
         param_encoding=urlencode(self.search_params)
         return f"{self.rootlink}?{param_encoding}"
 
-    def to_csv(self, file):
+    def to_json(self, file):
         ls_jobs = map(lambda job: job.to_list(), self.jobs)
-        with open(file, "w", encoding = "utf-8", newline="") as f:
-            writer = csv.writer(f, delimiter = ";")
-            writer.writerows(ls_jobs)
+        df = pd.DataFrame.from_records(ls_jobs)
+        with open(file, "w", encoding = 'utf-8') as output_file:
+            df.to_json(output_file, orient = "records")
+
     
 
     def _add_job(self, job_url, job_id = None, job_title = None, job_company = None):
@@ -57,7 +59,8 @@ class StepstoneParser(BaseParser):
                 break
             run_count+=1
         print("beginning enrichment")
-        ls_joblist = map(lambda job: job.parse(), self.jobs)
+        for job in self.jobs:
+            job.parse()
         
 
     def __parse_stepstone_page (self, link):
@@ -67,7 +70,7 @@ class StepstoneParser(BaseParser):
             return None
         for job in articles:
             job_title = job.find(attrs={"data-at" : "job-item-title"}).text
-            link = job.find(attrs={"data-at" : "job-item-title"})["href"]
+            link = "https://www.stepstone.de/"+job.find(attrs={"data-at" : "job-item-title"})["href"]
             company = job.find(attrs={"data-at" : "job-item-company-name"}).text
             job_id = job["id"]
             self._add_job(link, job_id, job_title, company)

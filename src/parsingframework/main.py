@@ -14,8 +14,11 @@ def main():
     #         print(exc)
     logging.basicConfig(filename="logs.txt")
     parser=StepstoneParser("Schauspieler", "Rheine", 30)
+
+    
     parser.parse()
-    #parser.to_csv("output.csv")
+    parser.to_json("output.json")
+
 
 if __name__ == '__main__':
     main()

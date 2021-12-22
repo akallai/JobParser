@@ -9,13 +9,17 @@ class Job(ABC):
         self.id = job_id
         self.title = job_title
         self.company = job_company
+        self.introduction = ""
+        self.description = ""
+        self.profile = ""
+        self.offer = ""
 
     @abstractmethod
     def parse(self):
         pass
 
     def to_list(self):
-        return [self.link, self.id, self.title, self.company]
+        return [self.link, self.id, self.title, self.company, self.introduction, self.description, self.profile, self.offer]
 
 
 class StepstoneJob(Job):
@@ -55,4 +59,3 @@ class StepstoneJob(Job):
             self.offer = offer
         except Exception:
             pass
-        return self
