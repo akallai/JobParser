@@ -1,6 +1,8 @@
-jobsite:
-  - stepstone
+database:
+  - Stepstone
 
+jobs: 
+  - Data Engineer
 
 location:
   city: Berlin
