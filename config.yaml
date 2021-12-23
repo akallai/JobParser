@@ -7,3 +7,6 @@ jobs:
 location:
   city: Berlin
   radius: 50 #km
+
+threads:
+  max: 10

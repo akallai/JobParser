@@ -17,6 +17,7 @@ def main():
     config_jobs = config["jobs"]
     config_city = config["location"]["city"]
     config_radius = config["location"]["radius"]
+    config_max_threads = config["threads"]["max"]
 
     if "Stepstone" in config_databases:
         for job in config_jobs:

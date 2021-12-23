@@ -3,14 +3,16 @@ from urllib.parse import urlencode
 import logging
 import csv
 import pandas as pd
+import concurrent.futures
 
 from helper import retrieve_website
 from jobs import StepstoneJob
 
 class BaseParser(ABC):
-    def __init__(self):
+    def __init__(self, max_threads):
         self.jobs = []
         self._create_startinglink()
+        self._thread_executor = concurrent.futures.ThreadPoolExecutor(max_workers = max_threads)
 
     @abstractmethod
     def parse(self):
@@ -64,13 +66,14 @@ class BaseParser(ABC):
 
 
 class StepstoneParser(BaseParser):
-    def __init__(self, search, location, radius):
+    def __init__(self, search, location, radius, max_threads):
         """Create a StepstoneParser
 
         Args:
             search (str): searchstring used for the search on the jobsite
             location (str): city or country of the location the job will be searched in
             radius (int): the radius of the location
+            max_threads(int): the maximum amount of threads running in parallel
         """        
         self.rootlink = "https://www.stepstone.de/5/ergebnisliste.html"
         self.search_params = {
@@ -78,7 +81,7 @@ class StepstoneParser(BaseParser):
             "where": location,
             "radius": radius
         }
-        super().__init__()
+        super().__init__(max_threads)
 
     def parse(self):
         run_count = 0
