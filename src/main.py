@@ -21,7 +21,7 @@ def main():
 
     if "Stepstone" in config_databases:
         for job in config_jobs:
-            parser = StepstoneParser(job, config_city, config_radius)
+            parser = StepstoneParser(job, config_city, config_radius, config_max_threads)
             parser.parse()
             parser.to_json("output.json")
     """

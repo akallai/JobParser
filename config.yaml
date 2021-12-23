@@ -2,11 +2,11 @@ database:
   - Stepstone
 
 jobs: 
-  - Data Engineer
+  - Schauspieler
 
 location:
-  city: Berlin
-  radius: 50 #km
+  city: Rheine
+  radius: 30 #km
 
 threads:
   max: 10

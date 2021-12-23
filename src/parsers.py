@@ -85,20 +85,21 @@ class StepstoneParser(BaseParser):
 
     def parse(self):
         run_count = 0
-        while True:
-            print("parsing next 25")
-            parselink=self._generate_page_link(page_keyword = "of", page = str(run_count * 25))
-            tmp=self.__parse_stepstone_page(parselink)
-            if (tmp!=-1):
-                break
-            run_count+=1
+        
+        pages = []
+        for i in range(2):
+            pages.append(self._generate_page_link(page_keyword = "of", page = str(i * 25)))
+        for page in pages:
+            self._thread_executor.submit(StepstoneParser.__parse_stepstone_page(self, page))
+        print("starting multithread-parseing")
+        #self._thread_executor.map(StepstoneParser.__parse_stepstone_page, pages)
+
         print("beginning enrichment")
         for job in self.jobs:
             job.parse()
-        
 
     def __parse_stepstone_page (self, link):
-        """parses a stepstonepage
+        """Parses a stepstonepage an adds it to the joblist.
 
         Args:
             link (str): link of the stepstone webpage
