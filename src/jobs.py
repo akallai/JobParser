@@ -78,3 +78,4 @@ class StepstoneJob(Job):
             self.offer = offer
         except Exception:
             pass
+        return self

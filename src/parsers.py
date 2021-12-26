@@ -9,10 +9,12 @@ from helper import retrieve_website
 from jobs import StepstoneJob
 
 class BaseParser(ABC):
-    def __init__(self, max_threads):
+    def __init__(self, max_threads, max_pages):
         self.jobs = []
         self._create_startinglink()
         self._thread_executor = concurrent.futures.ThreadPoolExecutor(max_workers = max_threads)
+        self._thread_jobs_finished = False
+        self._max_pages = max_pages
 
     @abstractmethod
     def parse(self):
@@ -66,14 +68,15 @@ class BaseParser(ABC):
 
 
 class StepstoneParser(BaseParser):
-    def __init__(self, search, location, radius, max_threads):
+    def __init__(self, search, location, radius, max_threads, max_pages):
         """Create a StepstoneParser
 
         Args:
             search (str): searchstring used for the search on the jobsite
             location (str): city or country of the location the job will be searched in
             radius (int): the radius of the location
-            max_threads(int): the maximum amount of threads running in parallel
+            max_threads(int): the maximum amount of threads running in parallel.
+            max_pages(int): The Maximum amount of pages being parsed.
         """        
         self.rootlink = "https://www.stepstone.de/5/ergebnisliste.html"
         self.search_params = {
@@ -81,25 +84,30 @@ class StepstoneParser(BaseParser):
             "where": location,
             "radius": radius
         }
-        super().__init__(max_threads)
+        super().__init__(max_threads, max_pages)
 
     def parse(self):
         run_count = 0
         
         pages = []
-        for i in range(2):
+        for i in range(self._max_pages):
             pages.append(self._generate_page_link(page_keyword = "of", page = str(i * 25)))
-        for page in pages:
-            self._thread_executor.submit(StepstoneParser.__parse_stepstone_page(self, page))
         print("starting multithread-parseing")
-        #self._thread_executor.map(StepstoneParser.__parse_stepstone_page, pages)
-
+        count = 0
+        for page in pages:
+            if (self._thread_jobs_finished):
+                print("BREAKED AT", page)
+                break
+            self._thread_executor.submit(StepstoneParser.__parse_stepstone_page(self, page))
+            print(count)
+            count+=1
         print("beginning enrichment")
-        for job in self.jobs:
-            job.parse()
+        
+        self.jobs = self._thread_executor.map(lambda x: x.parse(), self.jobs)
+        self._thread_executor.shutdown(wait=True)
 
     def __parse_stepstone_page (self, link):
-        """Parses a stepstonepage an adds it to the joblist.
+        """Parses a stepstonepage an adds it to the joblist. If no jobs are on the page, setts self._thread_jobs_finished to True.
 
         Args:
             link (str): link of the stepstone webpage
@@ -110,6 +118,7 @@ class StepstoneParser(BaseParser):
         soup = retrieve_website(link)
         articles = soup.find_all('article')
         if (not articles):
+            self._thread_jobs_finished = True
             return -1
         for job in articles:
             job_title = job.find(attrs={"data-at" : "job-item-title"}).text

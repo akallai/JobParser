@@ -18,10 +18,11 @@ def main():
     config_city = config["location"]["city"]
     config_radius = config["location"]["radius"]
     config_max_threads = config["threads"]["max"]
+    config_max_pages = config["max_pages"]
 
     if "Stepstone" in config_databases:
         for job in config_jobs:
-            parser = StepstoneParser(job, config_city, config_radius, config_max_threads)
+            parser = StepstoneParser(job, config_city, config_radius, config_max_threads, config_max_pages)
             parser.parse()
             parser.to_json("output.json")
     """
